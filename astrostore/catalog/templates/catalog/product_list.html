@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load catalog_tags %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span class="breadcrumb-separator">/</span><span>{% if active_category %}{{ active_category.name }}{% elif query %}نتایج جست‌وجو{% else %}همهٔ محصولات{% endif %}</span></nav>
+<div class="section-heading">
+  <div><span class="eyebrow">کاتالوگ فروشگاه</span><h1 class="page-title">{% if active_category %}{{ active_category.name }}{% elif query %}جست‌وجو برای «{{ query }}»{% else %}همهٔ محصولات{% endif %}</h1></div>
+  <span class="muted small">{{ page_obj.paginator.count|toman }} کالا</span>
+</div>
+<div class="listing-layout">
+  <aside class="filter-panel" aria-label="فیلتر محصولات">
+    <h2>فیلتر و مرتب‌سازی</h2>
+    <form method="get" action="">
+      {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+      <div class="filter-group"><strong>دسته‌بندی</strong>
+        {% for category in categories %}<label class="check-row"><input type="radio" name="category" value="{{ category.slug }}" {% if active_category.slug == category.slug %}checked{% endif %} onchange="this.form.submit()"><span>{{ category.name }}</span></label>{% endfor %}
+        {% if active_category %}<a class="text-link small" href="{% url 'catalog:products' %}">پاک‌کردن دسته</a>{% endif %}
+      </div>
+      <div class="filter-group"><strong>بازهٔ قیمت (تومان)</strong><div class="filter-row">
+        <label class="field"><span class="sr-only">از</span><input name="min_price" inputmode="numeric" placeholder="از" value="{{ min_price }}"></label>
+        <label class="field"><span class="sr-only">تا</span><input name="max_price" inputmode="numeric" placeholder="تا" value="{{ max_price }}"></label>
+      </div></div>
+      <div class="filter-group"><label class="check-row"><input type="checkbox" name="available" value="1" {% if available %}checked{% endif %}><span>فقط کالاهای موجود</span></label>
+        <label class="check-row"><input type="checkbox" name="discounted" value="1" {% if discounted %}checked{% endif %}><span>دارای تخفیف</span></label>
+      </div>
+      <div class="filter-group"><label for="sort">مرتب‌سازی</label>
+        <select id="sort" name="sort" class="form-control">
+          <option value="newest" {% if sort == 'newest' %}selected{% endif %}>جدیدترین</option>
+          <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>ارزان‌ترین</option>
+          <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>گران‌ترین</option>
+          <option value="popular" {% if sort == 'popular' %}selected{% endif %}>محبوب‌ترین</option>
+          <option value="bestseller" {% if sort == 'bestseller' %}selected{% endif %}>پرفروش‌ها</option>
+        </select>
+      </div>
+      <button class="button button-primary" type="submit">اعمال فیلتر</button>
+    </form>
+  </aside>
+  <section aria-label="فهرست محصولات">
+    {% if products %}
+      <div class="product-grid">{% for product in products %}{% include "catalog/_product_card.html" %}{% endfor %}</div>
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="pagination" aria-label="صفحه‌بندی">
+        {% if page_obj.has_previous %}<a href="?{% for key,value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" aria-label="صفحهٔ قبل">→</a>{% endif %}
+        <span class="current" aria-current="page">{{ page_obj.number }}</span>
+        <span>از {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?{% for key,value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" aria-label="صفحهٔ بعد">←</a>{% endif %}
+      </nav>
+      {% endif %}
+    {% else %}
+      <div class="empty-state"><span class="empty-state-mark" aria-hidden="true">⌕</span><h2>محصولی پیدا نشد</h2><p class="muted">عبارت جست‌وجو یا فیلترها را تغییر دهید.</p><a class="button button-outline" href="{% url 'catalog:products' %}">دیدن همهٔ محصولات</a></div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

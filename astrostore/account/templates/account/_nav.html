@@ -1,0 +1,9 @@
+<nav class="account-nav" aria-label="بخش‌های حساب">
+  <a href="{% url 'account:profile' %}">پروفایل</a>
+  <a href="{% url 'account:addresses' %}">نشانی‌ها</a>
+  <a href="{% url 'commerce:wishlist' %}">علاقه‌مندی‌ها</a>
+  <a href="{% url 'commerce:cart' %}">سبد خرید</a>
+  <a href="{% url 'commerce:orders' %}">سفارش‌ها</a>
+  <a href="{% url 'commerce:my_downloads' %}">دانلودهای من</a>
+  <form method="post" action="{% url 'account:logout' %}">{% csrf_token %}<button class="button button-quiet button-sm" type="submit">خروج از حساب</button></form>
+</nav>

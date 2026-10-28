@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load catalog_tags %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><a href="{% url 'commerce:orders' %}">سفارش‌ها</a><span>/</span><span>{{ order.order_number }}</span></nav>
+<div class="section-heading"><div><span class="eyebrow">جزئیات سفارش</span><h1 class="page-title"><bdi dir="ltr">{{ order.order_number }}</bdi></h1></div><span class="status-pill {{ order.status }}">{{ order.get_status_display }}</span></div>
+<div class="manager-two-col">
+  <section class="form-stack">
+    <div class="manager-panel"><h2>اقلام سفارش</h2><div class="cart-lines">
+      {% for item in order.items.all %}
+      <div class="cart-line">
+        <div class="cart-line-image">{% if item.image_snapshot %}<img src="{{ MEDIA_URL }}{{ item.image_snapshot }}" alt="" loading="lazy">{% else %}<span class="product-placeholder" aria-hidden="true"><span>✦</span></span>{% endif %}</div>
+        <div><strong>{{ item.product_name }}</strong>{% if item.variant_name %}<p class="small muted">{{ item.variant_name }}</p>{% endif %}<p class="small muted">کد: <bdi dir="ltr">{{ item.sku }}</bdi>{% if not item.is_digital %} · {{ item.quantity }} عدد{% endif %}</p>{% if item.is_digital and order.downloads_open %}<div class="form-actions">{% for asset in item.product.assets.all %}{% if asset.is_active %}<a class="button button-outline button-sm" href="{% url 'commerce:paid_download' item_id=item.pk asset_id=asset.pk %}">دانلود {{ asset.title }}</a>{% endif %}{% endfor %}</div><p class="small muted">دفعات دانلود: {{ item.download_count }}</p>{% endif %}</div>
+        <strong class="price">{{ item.line_total_toman|toman }} تومان</strong>
+      </div>
+      {% endfor %}
+    </div></div>
+    <div class="manager-panel"><h2>وضعیت سفارش</h2><ol class="order-timeline">{% for event in order.events.all %}{% if event.is_public %}<li class="timeline-event"><strong>{{ event.message }}</strong><div class="small muted">{{ event.created_at|date:"Y/m/d H:i" }}</div></li>{% endif %}{% endfor %}</ol></div>
+  </section>
+  <aside class="form-stack">
+    <div class="summary-card"><h2>خلاصهٔ پرداخت</h2>
+      <div class="summary-row"><span>جمع کالاها</span><b>{{ order.subtotal_toman|toman }} تومان</b></div>
+      <div class="summary-row"><span>تخفیف کالا</span><b>−{{ order.item_discount_toman|toman }} تومان</b></div>
+      <div class="summary-row"><span>تخفیف سفارش</span><b>−{{ order.coupon_discount_toman|toman }} تومان</b></div>
+      <div class="summary-row"><span>ارسال: {{ order.shipping_method_label }}</span><b>{{ order.shipping_toman|toman }} تومان</b></div>
+      <div class="summary-row"><span>مالیات ({{ order.tax_rate_percent }}٪)</span><b>{{ order.tax_toman|toman }} تومان</b></div>
+      <div class="summary-row total"><span>مبلغ سفارش</span><b>{{ order.total_toman|toman }} تومان</b></div>
+      {% for payment in order.payments.all %}<div class="summary-row"><span>وضعیت پرداخت</span><b class="status-pill {{ payment.status }}">{{ payment.get_status_display }}</b></div>{% if payment.reference_id %}<div class="summary-row"><span>شناسهٔ پیگیری</span><bdi dir="ltr">{{ payment.reference_id }}</bdi></div>{% endif %}{% endfor %}
+    </div>
+    {% if not order.is_digital_only %}<div class="manager-panel"><h2>نشانی ثبت‌شده</h2><p>{{ order.address_snapshot.recipient_name }}</p><p>{{ order.address_snapshot.province }}، {{ order.address_snapshot.city }}، {{ order.address_snapshot.address }}</p><p class="small muted">کد پستی: <bdi dir="ltr">{{ order.address_snapshot.postal_code }}</bdi> · <bdi dir="ltr">{{ order.address_snapshot.recipient_phone }}</bdi></p>
+      {% if order.shipping_tracking_number %}<p>شمارهٔ رهگیری: <bdi dir="ltr">{{ order.shipping_tracking_number }}</bdi></p><p class="small muted">اطلاعات رهگیری به‌صورت دستی از سوی فروشگاه ثبت شده است.</p>{% endif %}
+    </div>{% endif %}
+    {% if order.status == 'processing' or order.status == 'packed' %}
+      {% if not order.cancellation_request %}<form class="manager-panel form-stack" method="post" action="{% url 'commerce:request_cancellation' order_number=order.order_number %}">{% csrf_token %}<h2>درخواست لغو</h2><label class="field"><span>دلیل (اختیاری)</span><textarea name="reason" rows="2"></textarea></label><button class="button button-outline" type="submit">ارسال درخواست لغو</button></form>{% else %}<p class="message info">درخواست لغو شما در حال بررسی است.</p>{% endif %}
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+@font-face { font-family: "B Yekan"; src: url("../fonts/Yekan.ttf") format("truetype"); font-weight: 100 900; font-style: normal; font-display: swap; }
+:root {
+  /* Primitive palette */
+  --plum-950: #241722;
+  --plum-900: #302031;
+  --plum-800: #3d2639;
+  --plum-700: #4e2a44;
+  --plum-600: #663957;
+  --plum-100: #f3eaf0;
+  --plum-50: #faf5f8;
+  --pine-800: #264a43;
+  --pine-700: #315f54;
+  --pine-100: #e7f0ed;
+  --coral-700: #a33e2b;
+  --coral-600: #bd4e36;
+  --coral-100: #fbe8e1;
+  --saffron-700: #805400;
+  --saffron-500: #c8902a;
+  --saffron-100: #fbf0d9;
+  --sage-800: #1d6b42;
+  --sage-100: #e8f3ec;
+  --red-800: #a7352f;
+  --red-100: #fceae7;
+  --blue-800: #245d78;
+  --blue-100: #e7f0f5;
+  --ink-950: #261f1b;
+  --ink-700: #554b46;
+  --ink-600: #6e635d;
+  --ink-500: #817771;
+  --ink-400: #9a908a;
+  --sand-50: #fbf8f3;
+  --sand-100: #f4eee7;
+  --sand-200: #e8ded5;
+  --sand-300: #d8ccc1;
+  --control-border: #8c817a;
+  --white: #ffffff;
+  --focus-blue: #2f73a6;
+
+  /* Semantic layer */
+  --color-primary: var(--plum-700);
+  --color-primary-hover: var(--plum-800);
+  --color-primary-active: var(--plum-950);
+  --color-primary-soft: var(--plum-100);
+  --color-secondary: var(--pine-800);
+  --color-secondary-soft: var(--pine-100);
+  --color-accent: var(--coral-700);
+  --color-accent-soft: var(--coral-100);
+  --color-promotion: var(--saffron-700);
+  --color-promotion-soft: var(--saffron-100);
+  --color-bg: var(--sand-50);
+  --color-surface: var(--white);
+  --color-surface-raised: var(--white);
+  --color-subtle: var(--sand-100);
+  --color-text: var(--ink-950);
+  --color-text-secondary: var(--ink-700);
+  --color-text-muted: var(--ink-600);
+  --color-placeholder: var(--ink-600);
+  --color-border: var(--sand-200);
+  --color-divider: var(--sand-100);
+  --color-focus: var(--focus-blue);
+  --color-success: var(--sage-800);
+  --color-success-bg: var(--sage-100);
+  --color-warning: var(--saffron-700);
+  --color-warning-bg: var(--saffron-100);
+  --color-error: var(--red-800);
+  --color-error-bg: var(--red-100);
+  --color-info: var(--blue-800);
+  --color-info-bg: var(--blue-100);
+  --color-price: var(--ink-950);
+  --color-price-old: var(--ink-500);
+  --color-discount: var(--red-800);
+  --color-disabled-bg: #e9e4df;
+  --color-disabled-text: var(--ink-700);
+  --color-loading: var(--plum-600);
+  --color-selected: var(--plum-50);
+
+  /* Component layer */
+  --button-primary-bg: var(--color-primary);
+  --button-primary-hover: var(--color-primary-hover);
+  --button-primary-active: var(--color-primary-active);
+  --button-primary-text: var(--white);
+  --button-secondary-bg: var(--color-secondary);
+  --button-secondary-text: var(--white);
+  --input-bg: var(--color-surface);
+  --input-border: var(--control-border);
+  --input-border-focus: var(--color-focus);
+  --card-bg: var(--color-surface);
+  --card-border: var(--color-border);
+  --table-head-bg: var(--color-subtle);
+  --status-paid-bg: var(--color-success-bg);
+  --status-paid-text: var(--color-success);
+
+  --font-sans: "B Yekan", Tahoma, Arial, sans-serif;
+  --font-numeric: "B Yekan", Tahoma, Arial, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 2.75rem;
+  --line-body: 1.85;
+  --line-heading: 1.45;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-14: 3.5rem;
+  --space-18: 4.5rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-pill: 999px;
+  --shadow-soft: 0 8px 28px rgba(49, 32, 44, 0.07);
+  --shadow-card: 0 14px 44px rgba(49, 32, 44, 0.11);
+  --shadow-pop: 0 20px 64px rgba(36, 23, 34, 0.18);
+  --container-max: 80rem;
+  --transition-fast: 160ms ease;
+  --transition-medium: 280ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-medium: 0ms;
+  }
+}

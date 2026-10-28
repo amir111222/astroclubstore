@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><span>پرسش‌ها</span></nav>
+<span class="eyebrow">راهنما</span><h1 class="page-title">پرسش‌های پرتکرار</h1>
+{% if questions %}<div class="faq-list">{% for item in questions %}<details class="faq-item"><summary>{{ item.question }}</summary><p>{{ item.answer }}</p></details>{% endfor %}</div>
+{% else %}<div class="empty-state"><span class="empty-state-mark">?</span><h2>پرسشی منتشر نشده است</h2><p class="muted">مدیر فروشگاه می‌تواند پرسش‌ها را از بخش مدیریت اضافه کند.</p></div>{% endif %}
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "management/base.html" %}
+{% block manager_content %}
+<div class="manager-toolbar"><div><span class="eyebrow">کاتالوگ</span><h1 class="page-title">دسته‌بندی‌ها</h1></div><a class="button button-primary" href="{% url 'storefront:manager_category_create' %}">افزودن دسته</a></div>
+<div class="table-wrap"><table class="data-table"><thead><tr><th>نام</th><th>دستهٔ والد</th><th>محصول</th><th>نمایش</th><th>عملیات</th></tr></thead><tbody>{% for category in categories %}<tr><td>{{ category.name }}</td><td>{{ category.parent|default:"—" }}</td><td>{{ category.product_count }}</td><td>{{ category.is_active|yesno:"بله,خیر" }}</td><td><div class="table-actions"><a class="button button-quiet button-sm" href="{% url 'storefront:manager_category_edit' pk=category.pk %}">ویرایش</a>{% if category.is_active %}<form method="post" action="{% url 'storefront:manager_category_deactivate' pk=category.pk %}">{% csrf_token %}<button class="button button-danger button-sm" type="submit">پنهان‌کردن</button></form>{% endif %}</div></td></tr>{% empty %}<tr><td colspan="5">دسته‌ای ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

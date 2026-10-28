@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container narrow narrow-sm">
+  <section class="form-card">
+    <span class="eyebrow">ورود امن</span><h1 class="page-title">ورود با شمارهٔ همراه</h1>
+    <p class="muted">یک کد یک‌بارمصرف برای شمارهٔ شما ارسال می‌شود.</p>
+    <form method="post" class="form-stack" data-loading-form>
+      {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+      {% if form.non_field_errors %}<div class="form-error">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="field">{{ form.phone_number.label_tag }}{{ form.phone_number }}{% for error in form.phone_number.errors %}<span class="field-error">{{ error }}</span>{% endfor %}<small class="help-text">نمونه: ۰۹۱۲۱۲۳۴۵۶۷</small></div>
+      <label class="check-row">{{ form.remember_me }}<span>{{ form.remember_me.label }}</span></label>
+      <button class="button button-primary" type="submit">دریافت کد ورود</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

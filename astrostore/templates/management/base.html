@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="management-shell">
+  <nav class="manager-sidebar" aria-label="راهبری مدیریت">
+    <p class="eyebrow">مدیریت فروشگاه</p>
+    {% if perms.storefront.view_store_dashboard %}<a href="{% url 'storefront:manager_dashboard' %}">نمای کلی</a>{% endif %}
+    {% if perms.catalog.manage_products %}<a href="{% url 'storefront:manager_products' %}">محصولات</a>{% endif %}
+    {% if perms.catalog.manage_products %}<a href="{% url 'storefront:manager_digital' %}">محصولات دیجیتال</a>{% endif %}
+    {% if perms.catalog.manage_categories %}<a href="{% url 'storefront:manager_categories' %}">دسته‌بندی‌ها</a>{% endif %}
+    {% if perms.catalog.manage_inventory %}<a href="{% url 'storefront:manager_inventory' %}">موجودی</a>{% endif %}
+    {% if perms.commerce.manage_orders %}<a href="{% url 'storefront:manager_orders' %}">سفارش‌ها</a>{% endif %}
+    {% if perms.payments.manage_refunds %}<a href="{% url 'storefront:manager_orders' %}">بازپرداخت‌ها</a>{% endif %}
+    {% if perms.commerce.manage_promotions %}<a href="{% url 'storefront:manager_coupons' %}">کدهای تخفیف</a>{% endif %}
+    {% if perms.storefront.manage_store_settings %}<a href="{% url 'storefront:manager_settings' %}">تنظیمات فروشگاه</a><a href="{% url 'storefront:manager_shipping' %}">روش‌های ارسال</a>{% endif %}
+    {% if perms.storefront.manage_store_content %}<a href="{% url 'storefront:manager_banners' %}">بنرها</a><a href="{% url 'storefront:manager_sections' %}">بخش‌های خانه</a><a href="{% url 'storefront:manager_pages' %}">صفحه‌ها</a><a href="{% url 'storefront:manager_faqs' %}">پرسش‌های پرتکرار</a>{% endif %}
+    {% if perms.commerce.view_financial_reports %}<a href="{% url 'storefront:manager_audit' %}">گزارش تغییرات</a>{% endif %}
+    <a href="{% url 'storefront:home' %}">بازگشت به فروشگاه</a>
+  </nav>
+  <section class="manager-main">
+    {% block manager_content %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

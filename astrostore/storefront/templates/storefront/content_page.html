@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><span>{% if page %}{{ page.title }}{% else %}{{ placeholder_title }}{% endif %}</span></nav>
+<article class="form-card info-copy">
+  <span class="eyebrow">راهنمای فروشگاه</span><h1 class="page-title">{% if page %}{{ page.title }}{% else %}{{ placeholder_title }}{% endif %}</h1>
+  {% if page and page.body %}{{ page.body|linebreaks }}{% elif placeholder_body %}<p class="muted">{{ placeholder_body }}</p>{% else %}<p class="muted">این محتوا هنوز توسط مدیر فروشگاه تکمیل نشده است.</p>{% endif %}
+</article>
+{% endblock %}

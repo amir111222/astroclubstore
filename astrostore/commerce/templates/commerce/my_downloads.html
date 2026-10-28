@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><span>دانلودهای من</span></nav>
+<div class="section-heading"><div><span class="eyebrow">محصولات دیجیتال</span><h1 class="page-title">دانلودهای من</h1></div><a class="button button-outline" href="{% url 'catalog:free_downloads' %}">دانلودهای رایگان</a></div>
+<div class="manager-panel"><div class="cart-lines">
+  {% for item in items %}
+  <div class="cart-line">
+    <div><strong>{{ item.product_name }}</strong><p class="small muted">سفارش <bdi dir="ltr">{{ item.order.order_number }}</bdi> · دفعات دانلود: {{ item.download_count }} از {{ limit }}</p></div>
+    <div class="form-actions">{% for asset in item.product.assets.all %}{% if asset.is_active %}<a class="button button-primary button-sm" href="{% url 'commerce:paid_download' item_id=item.pk asset_id=asset.pk %}">دانلود {{ asset.title }}</a>{% endif %}{% endfor %}</div>
+  </div>
+  {% empty %}<p class="muted">هنوز محصول دیجیتالی خریداری نکرده‌اید.</p>{% endfor %}
+</div></div>
+{% endblock %}

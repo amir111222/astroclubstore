@@ -1,0 +1,14 @@
+.env
+.venv/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+astrostore/db.sqlite3
+astrostore/media/
+astrostore/staticfiles/
+astrostore/static/css/tailwind.generated.css
+
+private_media/
+astrostore/private_media/

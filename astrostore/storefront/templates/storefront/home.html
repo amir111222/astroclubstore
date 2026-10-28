@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load catalog_tags %}
+{% block content %}
+<section class="hero" aria-label="معرفی فروشگاه">
+  {% if banners %}
+    <div class="hero-copy">
+      {% for banner in banners %}
+        <div class="hero-slide" data-banner-slide data-banner-image="{% if banner.image %}{{ banner.image.url }}{% endif %}" {% if not forloop.first %}hidden{% endif %}>
+          <span class="eyebrow">انتخابی برای شما</span>
+          <h1>{{ banner.title }}</h1>
+          {% if banner.description %}<p>{{ banner.description }}</p>{% endif %}
+          {% if banner.cta_text and banner.cta_url %}<a class="button button-primary" href="{{ banner.cta_url }}">{{ banner.cta_text }} <span aria-hidden="true">←</span></a>{% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      {% with first_banner=banners.0 %}
+        {% if first_banner.image %}<img class="hero-banner-image" data-hero-image src="{{ first_banner.image.url }}" alt="" loading="eager">{% endif %}
+      {% endwith %}
+      <span class="hero-orbit"></span><span class="hero-disc"></span><span class="hero-dots"></span>
+    </div>
+    {% if banners|length > 1 %}
+      <div class="banner-controls" aria-label="انتخاب بنر">
+        {% for banner in banners %}<button class="banner-dot" type="button" data-banner-dot="{{ forloop.counter0 }}" aria-label="بنر {{ forloop.counter }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}"></button>{% endfor %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="hero-copy">
+      <span class="eyebrow">خرید روشن و ساده</span>
+      <h1>محصولی که دنبالش هستید، اینجاست.</h1>
+      <p>دسته‌بندی‌ها را مرور کنید، جزئیات را بخوانید و پیش از پرداخت هزینهٔ نهایی را ببینید.</p>
+      <a class="button button-primary" href="{% url 'catalog:products' %}">دیدن محصولات <span aria-hidden="true">←</span></a>
+    </div>
+    <div class="hero-art" aria-hidden="true"><span class="hero-orbit"></span><span class="hero-disc"></span><span class="hero-dots"></span></div>
+  {% endif %}
+</section>
+
+{% if categories %}
+<section class="section" aria-labelledby="category-heading">
+  <div class="section-heading"><div><span class="eyebrow">مرور آسان</span><h2 id="category-heading">دسته‌بندی‌ها</h2></div><a class="text-link" href="{% url 'catalog:categories' %}">همهٔ دسته‌ها ←</a></div>
+  <div class="category-strip">
+    {% for category in categories %}
+      <a class="category-tile" href="{% url 'catalog:category' category_slug=category.slug %}">
+        <span class="category-symbol" aria-hidden="true">{{ category.name|slice:":1" }}</span>
+        <strong>{{ category.name }}</strong>
+        {% if category.children.all %}<small>مشاهدهٔ محصولات</small>{% endif %}
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% for section in sections %}
+  {% if section.product_list %}
+  <section class="section" aria-labelledby="section-{{ forloop.counter }}">
+    <div class="section-heading"><div><span class="eyebrow">از فروشگاه</span><h2 id="section-{{ forloop.counter }}">{{ section.title }}</h2></div><a class="text-link" href="{% url 'catalog:products' %}">مشاهدهٔ همه ←</a></div>
+    <div class="product-grid">{% for product in section.product_list %}{% include "catalog/_product_card.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
+{% empty %}
+  <section class="section empty-state">
+    <span class="empty-state-mark" aria-hidden="true">✦</span>
+    <h2>کاتالوگ در حال آماده‌سازی است</h2>
+    <p class="muted">به‌محض انتشار محصولات، آن‌ها را در این صفحه خواهید دید.</p>
+  </section>
+{% endfor %}
+{% endblock %}

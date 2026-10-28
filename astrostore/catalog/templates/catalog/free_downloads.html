@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><span>دانلودهای رایگان</span></nav>
+<div class="section-heading"><div><span class="eyebrow">رایگان</span><h1 class="page-title">دانلودهای رایگان</h1></div></div>
+{% if products %}<div class="product-grid">{% for product in products %}{% include "catalog/_product_card.html" %}{% endfor %}</div>
+{% else %}<p class="muted">فعلاً محصول رایگانی منتشر نشده است.</p>{% endif %}
+{% endblock %}

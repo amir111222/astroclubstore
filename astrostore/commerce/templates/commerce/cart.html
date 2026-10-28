@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load catalog_tags %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><span>سبد خرید</span></nav>
+<h1 class="page-title">سبد خرید</h1>
+{% if cart.items.exists %}
+<div class="cart-layout">
+  <section class="cart-lines" aria-label="اقلام سبد">
+    {% if pricing_error %}<div class="message warning">{{ pricing_error }}</div>{% endif %}
+    {% for line in quote.lines %}
+    <article class="cart-line">
+      <a class="cart-line-image" href="{% url 'catalog:product' slug=line.product.slug %}" aria-label="{{ line.product.name }}">
+        {% if line.product.image %}<img src="{{ line.product.image.url }}" alt="" loading="lazy">{% else %}<span class="product-placeholder" aria-hidden="true"><span>✦</span></span>{% endif %}
+      </a>
+      <div><a class="text-link" href="{% url 'catalog:product' slug=line.product.slug %}"><strong>{{ line.product.name }}</strong></a>
+        {% if line.variant %}<p class="small muted">گزینه: {{ line.variant.title }}</p>{% endif %}
+        <p class="small muted">هر عدد: <bdi dir="ltr">{{ line.sale_unit_toman|toman }}</bdi> تومان{% if line.item_discount_toman %} · تخفیف محصول: <bdi dir="ltr">{{ line.item_discount_toman|toman }}</bdi> تومان{% endif %}</p>
+      </div>
+      <div class="cart-line-side">
+        {% if line.product.is_digital %}<span class="small muted">محصول دیجیتال</span>{% else %}<form class="quantity-control" method="post" action="{% url 'commerce:cart_update' item_id=line.cart_item_id %}">
+          {% csrf_token %}<label class="sr-only" for="quantity-{{ line.cart_item_id }}">تعداد {{ line.product.name }}</label>
+          <input id="quantity-{{ line.cart_item_id }}" type="number" min="0" max="99" name="quantity" value="{{ line.quantity }}">
+          <button class="button button-outline button-sm" type="submit">به‌روزرسانی</button>
+        </form>{% endif %}
+        <strong class="price"><bdi dir="ltr">{{ line.line_total_toman|toman }}</bdi> تومان</strong>
+        <form method="post" action="{% url 'commerce:cart_remove' item_id=line.cart_item_id %}">{% csrf_token %}<button class="button button-quiet button-sm" type="submit">حذف</button></form>
+      </div>
+    </article>
+    {% empty %}
+      {% for item in cart.items.all %}<article class="cart-line"><div>{{ item.product.name }}</div><p class="field-error">{{ pricing_error }}</p></article>{% endfor %}
+    {% endfor %}
+    <a class="text-link" href="{% url 'catalog:products' %}">← ادامهٔ خرید</a>
+  </section>
+  {% if quote %}
+  <aside class="summary-card">
+    <h2>خلاصهٔ سبد</h2>
+    <div class="summary-row"><span>جمع کالاها</span><b>{{ quote.subtotal_toman|toman }} تومان</b></div>
+    <div class="summary-row"><span>تخفیف کالاها</span><b>{{ quote.item_discount_toman|toman }} تومان</b></div>
+    <div class="summary-row"><span>ارسال تخمینی</span><b>{{ quote.shipping_toman|toman }} تومان</b></div>
+    <div class="summary-row"><span>مالیات تخمینی</span><b>{{ quote.tax_toman|toman }} تومان</b></div>
+    <div class="summary-row total"><span>جمع تخمینی</span><b>{{ quote.total_toman|toman }} تومان</b></div>
+    <p class="small muted">هزینهٔ نهایی پس از انتخاب نشانی، پیش از پرداخت تأیید می‌شود.</p>
+    <a class="button button-primary" href="{% url 'commerce:checkout' %}">ادامه به پرداخت</a>
+  </aside>
+  {% endif %}
+</div>
+{% else %}
+<div class="empty-state"><span class="empty-state-mark" aria-hidden="true">▱</span><h2>سبد خرید خالی است</h2><p class="muted">محصولی را به سبد اضافه کنید تا اینجا ببینید.</p><a class="button button-primary" href="{% url 'catalog:products' %}">دیدن محصولات</a></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><span>تماس با ما</span></nav>
+<span class="eyebrow">پشتیبانی فروشگاه</span><h1 class="page-title">تماس با ما</h1>
+<div class="manager-two-col">
+  <section class="info-card">
+    {% if page and page.body %}<div class="info-copy">{{ page.body|linebreaks }}</div>{% endif %}
+    {% if store_settings.contact_phone %}<p><strong>تلفن:</strong> <a class="text-link" dir="ltr" href="tel:{{ store_settings.contact_phone }}">{{ store_settings.contact_phone }}</a></p>{% endif %}
+    {% if store_settings.contact_email %}<p><strong>ایمیل:</strong> <a class="text-link" dir="ltr" href="mailto:{{ store_settings.contact_email }}">{{ store_settings.contact_email }}</a></p>{% endif %}
+    {% if store_settings.contact_address %}<p><strong>نشانی:</strong> {{ store_settings.contact_address }}</p>{% endif %}
+    {% if not store_settings.contact_phone and not store_settings.contact_email and not store_settings.contact_address %}
+      <p class="muted">اطلاعات تماس هنوز توسط مدیر فروشگاه وارد نشده است.</p>
+    {% endif %}
+  </section>
+  <aside class="info-card"><h2>پیش از تماس</h2><p>برای پیگیری سفارش، شمارهٔ سفارش را از بخش تاریخچهٔ سفارش‌ها بردارید.</p>
+    {% if request.user.is_authenticated %}<a class="button button-outline" href="{% url 'commerce:orders' %}">سفارش‌های من</a>
+    {% else %}<a class="button button-outline" href="{% url 'account:login' %}">ورود به حساب</a>{% endif %}
+  </aside>
+</div>
+{% endblock %}

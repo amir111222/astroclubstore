@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><span>نشانی‌ها</span></nav>
+<h1 class="page-title">نشانی‌های من</h1>
+<div class="account-layout">
+  {% include "account/_nav.html" %}
+  <div class="form-stack">
+    <section class="form-card"><h2>افزودن نشانی</h2>
+      <form method="post" class="form-stack">{% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-error">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="form-grid">{% for field in form %}
+          <div class="field {% if field.name == 'is_default' %}check-row{% endif %}">
+            {% if field.name == 'is_default' %}{{ field }}<span>{{ field.label }}</span>{% else %}{{ field.label_tag }}{{ field }}{% endif %}
+            {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+          </div>
+        {% endfor %}</div>
+        <button class="button button-primary" type="submit">ذخیرهٔ نشانی</button>
+      </form>
+    </section>
+    <section class="form-stack" aria-label="نشانی‌های ثبت‌شده">
+      {% for address in addresses %}
+      <article class="address-card">
+        <div><strong>{{ address.recipient_name }}</strong> {% if address.is_default %}<span class="status-pill paid">پیش‌فرض</span>{% endif %}
+          <p>{{ address.province }}، {{ address.city }} — {{ address.address }}{% if address.details %}، {{ address.details }}{% endif %}</p>
+          <p class="small muted"><bdi dir="ltr">{{ address.recipient_phone }}</bdi> · کد پستی <bdi dir="ltr">{{ address.postal_code }}</bdi></p>
+        </div>
+        <div class="address-actions">
+          <a class="button button-outline button-sm" href="{% url 'account:address_edit' pk=address.pk %}">ویرایش</a>
+          {% if not address.is_default %}<form method="post" action="{% url 'account:address_default' pk=address.pk %}">{% csrf_token %}<button class="button button-quiet button-sm" type="submit">پیش‌فرض</button></form>{% endif %}
+          <form method="post" action="{% url 'account:address_delete' pk=address.pk %}">{% csrf_token %}<button class="button button-danger button-sm" type="submit">حذف</button></form>
+        </div>
+      </article>
+      {% empty %}<div class="empty-state"><h2>هنوز نشانی ثبت نشده است</h2><p class="muted">یک نشانی برای ارسال سفارش اضافه کنید.</p></div>{% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}

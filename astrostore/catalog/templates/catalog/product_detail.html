@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load catalog_tags %}
+{% block extra_head %}<script type="application/ld+json">{{ product|product_json_ld }}</script>{% endblock %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span>{% if product.category %}<a href="{% url 'catalog:category' category_slug=product.category.slug %}">{{ product.category.name }}</a><span>/</span>{% endif %}<span>{{ product.name }}</span></nav>
+<div class="product-detail">
+  <div>
+    <div class="product-gallery-main">
+      {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}" fetchpriority="high">
+      {% elif product.gallery.all %}<img src="{{ product.gallery.first.image.url }}" alt="{{ product.gallery.first.alt_text|default:product.name }}" fetchpriority="high">
+      {% else %}<span class="product-placeholder" aria-hidden="true"><span>✦</span></span>{% endif %}
+    </div>
+    {% if product.gallery.all %}
+    <div class="product-thumbnails">
+      {% for image in product.gallery.all %}<img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" loading="lazy">{% endfor %}
+    </div>
+    {% endif %}
+  </div>
+  <section class="product-info">
+    {% if product.category %}<a class="eyebrow" href="{% url 'catalog:category' category_slug=product.category.slug %}">{{ product.category.name }}</a>{% endif %}
+    <h1>{{ product.name }}</h1>
+    {% if product.short_description %}<p class="muted">{{ product.short_description }}</p>{% endif %}
+    {% if product.sale_price_toman %}<span class="price-old">{{ product.price_toman|toman }} تومان</span>{% endif %}
+    {% if product.is_free %}<p class="price product-detail-price">رایگان</p>{% else %}<p class="price product-detail-price"><bdi dir="ltr" data-product-price data-default-price="{{ product.available_price_toman }}">{{ product.available_price_toman|toman }}</bdi> <span class="price-unit">تومان</span></p>{% endif %}
+    {% if product.is_digital %}<span class="stock-pill">{% if product.is_free %}رایگان · {% endif %}دیجیتال</span>{% elif product.is_available %}<span class="stock-pill" data-product-stock>موجود</span>{% else %}<span class="stock-pill out" data-product-stock>ناموجود</span>{% endif %}
+    {% if product.description %}<div class="info-copy"><h2>توضیحات</h2>{{ product.description|linebreaks }}</div>{% endif %}
+    {% if product.specifications %}
+      <dl class="product-specs">
+        {% for key,value in product.specifications.items %}<div class="spec-item"><dt>{{ key }}</dt><dd>{{ value }}</dd></div>{% endfor %}
+      </dl>
+    {% endif %}
+    {% if product.is_digital %}
+      <div class="manager-panel"><h2>فایل‌های محصول</h2>
+        <ul class="form-stack">{% for asset in product.assets.all %}{% if asset.is_active %}<li class="small">{{ asset.title }} · <bdi dir="ltr">{{ asset.size_bytes|filesizeformat }}</bdi></li>{% endif %}{% endfor %}</ul>
+      </div>
+      {% if product.is_free %}
+        {% if user.is_authenticated %}
+          {% for asset in product.assets.all %}{% if asset.is_active %}<a class="button button-primary" href="{% url 'catalog:free_download' asset_id=asset.pk %}">دانلود رایگان: {{ asset.title }}</a>{% endif %}{% endfor %}
+        {% else %}
+          <a class="button button-primary" href="{% url 'account:login' %}?next={{ request.path }}">برای دانلود وارد شوید</a>
+        {% endif %}
+      {% else %}
+        <form class="form-stack" method="post" action="{% url 'commerce:cart_add' slug=product.slug %}" data-add-to-cart>
+          {% csrf_token %}<input type="hidden" name="quantity" value="1">
+          <button class="button button-primary" type="submit" {% if not product.is_available %}disabled{% endif %}>افزودن به سبد خرید</button>
+        </form>
+      {% endif %}
+    {% else %}
+    <form class="form-stack" method="post" action="{% url 'commerce:cart_add' slug=product.slug %}" data-add-to-cart>
+      {% csrf_token %}
+      {% if product.variants.all %}
+        <label class="field"><span>گزینهٔ محصول</span>
+          <select name="variant" required data-variant-select>
+            <option value="">انتخاب کنید</option>
+            {% for variant in product.variants.all %}
+              {% if variant.is_active %}
+              <option value="{{ variant.pk }}" data-price="{{ variant.current_price_toman }}" data-stock="{{ variant.stock_quantity }}" {% if not variant.stock_quantity %}disabled{% endif %}>{{ variant.title }}{% if not variant.stock_quantity %} — ناموجود{% endif %}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </label>
+      {% endif %}
+      <label class="field"><span>تعداد</span><input type="number" name="quantity" value="1" min="1" max="99" inputmode="numeric" required></label>
+      <button class="button button-primary" type="submit" {% if not product.is_available %}disabled{% endif %}>افزودن به سبد خرید</button>
+    </form>
+    {% endif %}
+    <form method="post" action="{% url 'commerce:wishlist_add' slug=product.slug %}" class="form-actions">
+      {% csrf_token %}<button class="button button-outline" type="submit">افزودن به علاقه‌مندی‌ها ♡</button>
+    </form>
+    {% if product.is_digital %}<p class="small muted">این محصول دیجیتال است و بدون هزینهٔ ارسال، بلافاصله پس از پرداخت قابل دانلود است.</p>{% else %}<p class="small muted">هزینهٔ ارسال و مالیات در مرحلهٔ نهایی سفارش، پیش از پرداخت نمایش داده می‌شود.</p>{% endif %}
+  </section>
+</div>
+{% if related_products %}
+<section class="section"><div class="section-heading"><h2>محصولات مرتبط</h2></div><div class="product-grid">{% for product in related_products %}{% include "catalog/_product_card.html" %}{% endfor %}</div></section>
+{% endif %}
+{% endblock %}

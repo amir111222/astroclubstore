@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><span>دسته‌بندی‌ها</span></nav>
+<span class="eyebrow">مرور فروشگاه</span><h1 class="page-title">دسته‌بندی‌ها</h1>
+{% if categories %}
+<div class="category-strip">
+  {% for category in categories %}
+  <a class="category-tile" href="{% url 'catalog:category' category_slug=category.slug %}">
+    {% if category.image %}<img src="{{ category.image.url }}" alt="" loading="lazy">{% else %}<span class="category-symbol" aria-hidden="true">{{ category.name|slice:":1" }}</span>{% endif %}
+    <strong>{{ category.name }}</strong>{% if category.description %}<small>{{ category.description|truncatechars:75 }}</small>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}<div class="empty-state"><span class="empty-state-mark">◇</span><h2>دسته‌بندی آماده نشده است</h2><p class="muted">مدیر فروشگاه دسته‌ها را اینجا منتشر می‌کند.</p></div>{% endif %}
+{% endblock %}

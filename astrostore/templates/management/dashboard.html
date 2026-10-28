@@ -1,0 +1,17 @@
+{% extends "management/base.html" %}{% load catalog_tags %}
+{% block manager_content %}
+<div class="manager-toolbar"><div><span class="eyebrow">نمای کلی</span><h1 class="page-title">داشبورد فروشگاه</h1></div>
+<form method="get" class="field"><label for="period">بازهٔ گزارش</label><select id="period" name="days" class="form-control"><option value="7" {% if days == 7 %}selected{% endif %}>۷ روز</option><option value="30" {% if days == 30 %}selected{% endif %}>۳۰ روز</option><option value="90" {% if days == 90 %}selected{% endif %}>۹۰ روز</option><option value="365" {% if days == 365 %}selected{% endif %}>یک سال</option></select></form></div>
+<div class="metric-grid">
+  <article class="metric-card"><span>کل سفارش‌های بازه</span><strong>{{ total_orders|fa_num }}</strong></article>
+  <article class="metric-card"><span>پرداخت‌های تأییدشده</span><strong>{{ paid_orders|fa_num }}</strong></article>
+  <article class="metric-card"><span>سفارش‌های نیازمند پیگیری</span><strong>{{ pending_payments|fa_num }}</strong></article>
+  <article class="metric-card"><span>فروش خالص ثبت‌شده</span><strong>{{ revenue|toman }} <small>تومان</small></strong></article>
+</div>
+<p class="muted small">فروش بر اساس زمان تأیید پرداخت و رسیدهای بازپرداخت تطبیق‌شده در همان بازه محاسبه شده است.</p>
+<div class="manager-two-col section">
+<section class="surface manager-panel"><h2>سفارش‌های اخیر</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>شماره</th><th>مشتری</th><th>وضعیت</th><th>جمع</th></tr></thead><tbody>{% for order in recent_orders %}<tr><td><a class="text-link" href="{% url 'storefront:manager_order_detail' order_number=order.order_number %}">{{ order.order_number }}</a></td><td>{{ order.user.phone_number }}</td><td>{{ order.get_status_display }}</td><td>{{ order.total_toman|toman }}</td></tr>{% empty %}<tr><td colspan="4">هنوز سفارشی ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div><a class="button button-quiet button-sm section-link" href="{% url 'storefront:manager_orders' %}">همهٔ سفارش‌ها</a></section>
+<section class="surface manager-panel"><h2>نیازمند رسیدگی</h2><h3>موجودی کم</h3><ul class="manager-list">{% for product in low_stock %}<li><a href="{% url 'storefront:manager_product_edit' pk=product.pk %}">{{ product.name }}</a><span>{{ product.available_stock|fa_num }} عدد</span></li>{% empty %}<li class="muted">موردی نیست.</li>{% endfor %}</ul><h3>آماده‌سازی سفارش</h3><ul class="manager-list">{% for order in awaiting %}<li><a href="{% url 'storefront:manager_order_detail' order_number=order.order_number %}">{{ order.order_number }}</a><span>{{ order.get_status_display }}</span></li>{% empty %}<li class="muted">موردی نیست.</li>{% endfor %}</ul></section>
+</div>
+<section class="surface manager-panel"><h2>محصولات پرفروش</h2><div class="manager-list">{% for product in bestsellers %}<div><a href="{% url 'storefront:manager_product_edit' pk=product.pk %}">{{ product.name }}</a><span>{{ product.sold|default:0|fa_num }} عدد</span></div>{% empty %}<p class="muted">دادهٔ فروش کافی نیست.</p>{% endfor %}</div></section>
+{% endblock %}

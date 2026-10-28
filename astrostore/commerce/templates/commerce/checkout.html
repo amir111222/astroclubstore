@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load catalog_tags %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><a href="{% url 'commerce:cart' %}">سبد خرید</a><span>/</span><span>تأیید سفارش</span></nav>
+<h1 class="page-title">تأیید سفارش</h1>
+<div class="checkout-layout">
+  <section class="form-stack">
+    <form method="post" class="form-card form-stack" data-loading-form>
+      {% csrf_token %}
+      {{ form.quote_token }}{{ form.checkout_key }}
+      {% if form.non_field_errors %}<div class="form-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% if needs_address %}<fieldset class="fieldset"><legend>۱. نشانی ارسال</legend>
+        {% if form.address.errors %}<p class="field-error">{{ form.address.errors }}</p>{% endif %}
+        <div class="checkout-addresses">
+          {% for address in addresses %}
+          <label class="address-option">
+            <input type="radio" name="address" value="{{ address.pk }}" {% if form.address.value|stringformat:"s" == address.pk|stringformat:"s" or not form.address.value and address.is_default %}checked{% endif %} required>
+            <span><strong>{{ address.recipient_name }}</strong> · {{ address.province }}، {{ address.city }}<br><small>{{ address.address }}</small></span>
+          </label>
+          {% endfor %}
+        </div>
+        <a class="text-link small" href="{% url 'account:addresses' %}">مدیریت نشانی‌ها</a>
+      </fieldset>{% endif %}
+      <fieldset class="fieldset"><legend>۲. کد تخفیف</legend>
+        <div class="field"><label for="coupon-code">کد تخفیف (در صورت داشتن)</label><input id="coupon-code" name="coupon_code" value="{{ form.coupon_code.value|default:'' }}" maxlength="40" autocomplete="off"></div>
+        {% if form.coupon_code.errors %}<p class="field-error">{{ form.coupon_code.errors }}</p>{% endif %}
+      </fieldset>
+      <p class="small muted">با زدن دکمه، مبلغ نهایی همین صفحه تأیید و برای پرداخت به درگاه هدایت می‌شوید. قیمت، تخفیف و موجودی در سمت سرور دوباره بررسی می‌شود.</p>
+      <button class="button button-primary" type="submit" {% if not quote %}disabled{% endif %} data-submit-label="در حال ساخت سفارش…">تأیید مبلغ و رفتن به درگاه</button>
+    </form>
+    <section class="manager-panel">
+      <h2>اقلام سفارش</h2>
+      {% if quote %}
+      <div class="cart-lines">{% for line in quote.lines %}
+        <div class="summary-row"><span>{{ line.product.name }}{% if line.variant %} — {{ line.variant.title }}{% endif %} × {{ line.quantity }}</span><strong>{{ line.line_total_toman|toman }} تومان</strong></div>
+      {% endfor %}</div>
+      {% endif %}
+    </section>
+  </section>
+  {% if quote %}
+  <aside class="summary-card">
+    <h2>ریز مبلغ نهایی</h2>
+    <div class="summary-row"><span>جمع کالاها</span><b>{{ quote.subtotal_toman|toman }} تومان</b></div>
+    <div class="summary-row"><span>تخفیف قیمت کالا</span><b>−{{ quote.item_discount_toman|toman }} تومان</b></div>
+    {% if quote.coupon_discount_toman %}<div class="summary-row"><span>کد تخفیف {{ quote.coupon.code }}</span><b>−{{ quote.coupon_discount_toman|toman }} تومان</b></div>{% endif %}
+    <div class="summary-row"><span>مبنای مالیات ({{ quote.tax_rate_percent }}٪)</span><b>{{ quote.taxable_base_toman|toman }} تومان</b></div>
+    <div class="summary-row"><span>مالیات</span><b>{{ quote.tax_toman|toman }} تومان</b></div>
+    <div class="summary-row"><span>{{ quote.shipping_label }}</span><b>{{ quote.shipping_toman|toman }} تومان</b></div>
+    <div class="summary-row total"><span>مبلغ قابل پرداخت</span><b>{{ quote.total_toman|toman }} تومان</b></div>
+  </aside>
+  {% endif %}
+</div>
+{% endblock %}

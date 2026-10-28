@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container narrow narrow-sm"><section class="form-card"><span class="eyebrow">حریم خصوصی</span><h1 class="page-title">درخواست حذف حساب</h1>
+<p class="muted">درخواست ثبت می‌شود تا بررسی شود. سوابقی که برای انجام سفارش یا تکالیف نگهداری لازم‌اند، مطابق سیاست فروشگاه رسیدگی خواهند شد.</p>
+<form method="post" class="form-stack">{% csrf_token %}
+  <div class="field">{{ form.reason.label_tag }}{{ form.reason }}{% for error in form.reason.errors %}<span class="field-error">{{ error }}</span>{% endfor %}</div>
+  <button class="button button-danger" type="submit">ثبت درخواست</button>
+</form></section></div>
+{% endblock %}

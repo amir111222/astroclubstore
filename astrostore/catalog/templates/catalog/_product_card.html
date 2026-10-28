@@ -1,0 +1,18 @@
+{% load catalog_tags %}
+<article class="product-card">
+  <a class="product-image" href="{% url 'catalog:product' slug=product.slug %}" aria-label="مشاهدهٔ {{ product.name }}">
+    {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+    {% else %}<span class="product-placeholder" aria-hidden="true"><span>✦</span></span>{% endif %}
+    {% if product.is_free %}<span class="product-badge">رایگان</span>{% elif product.is_digital %}<span class="product-badge">دیجیتال</span>{% elif product.sale_price_toman %}<span class="product-badge">پیشنهاد ویژه</span>{% endif %}
+  </a>
+  <div class="product-card-body">
+    {% if product.category %}<span class="category-name">{{ product.category.name }}</span>{% endif %}
+    <h3><a href="{% url 'catalog:product' slug=product.slug %}">{{ product.name }}</a></h3>
+    {% if product.short_description %}<p class="muted small">{{ product.short_description|truncatechars:80 }}</p>{% endif %}
+    <div class="product-price-row">
+      {% if product.sale_price_toman %}<span class="price-old">{{ product.price_toman|toman }} تومان</span>{% endif %}
+      {% if product.is_free %}<span class="price">رایگان</span>{% else %}<span class="price"><bdi dir="ltr">{{ product.available_price_toman|toman }}</bdi> <span class="price-unit">تومان</span></span>{% endif %}
+    </div>
+    <a class="button button-outline button-sm product-card-action" href="{% url 'catalog:product' slug=product.slug %}">جزئیات محصول</a>
+  </div>
+</article>

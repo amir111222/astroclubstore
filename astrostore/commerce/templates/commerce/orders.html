@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load catalog_tags %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><a href="{% url 'account:profile' %}">حساب من</a><span>/</span><span>سفارش‌ها</span></nav>
+<h1 class="page-title">سفارش‌های من</h1>
+<div class="account-layout">{% include "account/_nav.html" %}
+  <section>
+    {% if orders %}
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>شماره</th><th>تاریخ</th><th>وضعیت سفارش</th><th>پرداخت</th><th>مبلغ</th><th></th></tr></thead><tbody>
+    {% for order in orders %}{% with payment=order.payment %}
+      <tr><td><bdi dir="ltr">{{ order.order_number }}</bdi></td><td>{{ order.placed_at|date:"Y/m/d H:i" }}</td><td><span class="status-pill {{ order.status }}">{{ order.get_status_display }}</span></td><td>{% if payment %}<span class="status-pill {{ payment.status }}">{{ payment.get_status_display }}</span>{% else %}—{% endif %}</td><td>{{ order.total_toman|toman }} تومان</td><td><a class="text-link" href="{% url 'commerce:order_detail' order_number=order.order_number %}">جزئیات</a></td></tr>
+    {% endwith %}{% endfor %}
+    </tbody></table></div>
+    {% else %}<div class="empty-state"><span class="empty-state-mark">▤</span><h2>هنوز سفارشی ندارید</h2><p class="muted">پس از پرداخت، سفارش‌ها اینجا نمایش داده می‌شوند.</p><a class="button button-primary" href="{% url 'catalog:products' %}">مرور محصولات</a></div>{% endif %}
+  </section>
+</div>
+{% endblock %}

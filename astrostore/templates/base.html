@@ -1,0 +1,102 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4e2a44">
+  <meta name="description" content="{{ meta_description|default:'فروشگاه اینترنتی' }}">
+  <title>{% if page_title %}{{ page_title }} · {% endif %}{{ store_name }}</title>
+  {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/store.css' %}">
+  {% if tailwind_built %}<link rel="stylesheet" href="{% static 'css/tailwind.generated.css' %}">{% endif %}
+  {% if store_settings.favicon %}<link rel="icon" href="{{ store_settings.favicon.url }}">{% endif %}
+  <script defer src="{% static 'js/site.js' %}"></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main-content">رفتن به محتوای اصلی</a>
+  {% if store_settings.announcement_active and store_settings.announcement_text %}
+    <div class="announcement">{{ store_settings.announcement_text }}</div>
+  {% endif %}
+  <header class="site-header">
+    <div class="container header-main">
+      <a class="brand" href="{% url 'storefront:home' %}" aria-label="{{ store_name }}، صفحهٔ اصلی">
+        {% if store_settings.logo %}
+          <img src="{{ store_settings.logo.url }}" alt="" width="38" height="38">
+        {% else %}
+          <span class="brand-mark" aria-hidden="true"><span>آ</span></span>
+        {% endif %}
+        <span>{{ store_name }}</span>
+      </a>
+      <form class="header-search" method="get" action="{% url 'catalog:search' %}" role="search">
+        <label class="sr-only" for="site-search">جست‌وجوی محصول</label>
+        <input id="site-search" type="search" name="q" value="{{ request.GET.q }}" placeholder="دنبال چه چیزی می‌گردید؟">
+        <button class="button button-primary button-sm" type="submit">جست‌وجو</button>
+      </form>
+      <div class="header-actions">
+        {% if request.user.is_authenticated %}
+          <a class="icon-link" href="{% url 'account:profile' %}"><span class="nav-icon nav-icon-profile" aria-hidden="true"></span><span class="action-label">حساب من</span></a>
+        {% else %}
+          <a class="icon-link" href="{% url 'account:login' %}"><span class="nav-icon nav-icon-profile" aria-hidden="true"></span><span class="action-label">ورود</span></a>
+        {% endif %}
+        <a class="icon-link" href="{% url 'commerce:wishlist' %}" aria-label="علاقه‌مندی‌ها"><span class="nav-icon nav-icon-wishlist" aria-hidden="true"></span><span class="action-label">علاقه‌مندی‌ها</span></a>
+        <a class="icon-link" href="{% url 'commerce:cart' %}" aria-label="سبد خرید، {{ cart_count }} کالا">
+          <span class="nav-icon nav-icon-cart" aria-hidden="true"></span><span class="action-label">سبد</span><span class="count-badge">{{ cart_count }}</span>
+        </a>
+      </div>
+    </div>
+    <nav class="main-nav" aria-label="راهبری اصلی">
+      <div class="container nav-inner">
+        <button class="mobile-menu-button" type="button" data-menu-toggle aria-expanded="false" aria-controls="main-navigation">فهرست ☰</button>
+        <ul class="nav-links" id="main-navigation">
+          <li><a href="{% url 'storefront:home' %}">خانه</a></li>
+          <li><a href="{% url 'catalog:products' %}">همهٔ محصولات</a></li>
+          <li><a href="{% url 'catalog:categories' %}">دسته‌بندی‌ها</a></li>
+          <li><a href="{% url 'storefront:about' %}">دربارهٔ ما</a></li>
+          <li><a href="{% url 'storefront:contact' %}">تماس</a></li>
+          <li><a href="{% url 'storefront:faq' %}">پرسش‌ها</a></li>
+          {% if show_manager_link %}<li><a href="{% url 'storefront:manager_dashboard' %}">مدیریت فروشگاه</a></li>{% endif %}
+        </ul>
+      </div>
+    </nav>
+  </header>
+  <main class="container page-shell" id="main-content">
+    {% if messages %}
+      <div class="message-list" aria-live="polite">
+        {% for message in messages %}<div class="message {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <section>
+          <h2>{{ store_name }}</h2>
+          <p>برای آگاهی از موجودی، شیوهٔ ارسال و شرایط خرید، جزئیات هر محصول و صفحه‌های راهنما را ببینید.</p>
+        </section>
+        <section><h3>خرید</h3><div class="footer-links">
+          <a href="{% url 'catalog:products' %}">محصولات</a>
+          <a href="{% url 'catalog:categories' %}">دسته‌بندی‌ها</a>
+          <a href="{% url 'commerce:cart' %}">سبد خرید</a>
+        </div></section>
+        <section><h3>راهنما</h3><div class="footer-links">
+          <a href="{% url 'storefront:content_page' slug='shipping' %}">ارسال و تحویل</a>
+          <a href="{% url 'storefront:content_page' slug='returns' %}">بازگشت کالا</a>
+          <a href="{% url 'storefront:content_page' slug='privacy' %}">حریم خصوصی</a>
+          <a href="{% url 'storefront:content_page' slug='terms' %}">شرایط استفاده</a>
+        </div></section>
+        <section><h3>ارتباط</h3><div class="footer-links">
+          <a href="{% url 'storefront:contact' %}">اطلاعات تماس</a>
+          {% if store_settings.contact_phone %}<span dir="ltr">{{ store_settings.contact_phone }}</span>{% endif %}
+          {% if store_settings.contact_email %}<span dir="ltr">{{ store_settings.contact_email }}</span>{% endif %}
+          {% for platform,url in store_settings.social_links.items %}<a href="{{ url }}" target="_blank" rel="noopener noreferrer">{{ platform }}</a>{% endfor %}
+        </div></section>
+      </div>
+      <div class="footer-bottom"><span>قیمت‌ها به تومان نمایش داده می‌شوند.</span><span>محتوای فروشگاه توسط مدیر آن تنظیم می‌شود.</span></div>
+    </div>
+  </footer>
+</body>
+</html>

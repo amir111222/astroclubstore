@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span><span>دربارهٔ ما</span></nav>
+<article class="form-card info-copy"><span class="eyebrow">آشنایی با فروشگاه</span><h1 class="page-title">{{ title }}</h1>
+  {% if page and page.body %}{{ page.body|linebreaks }}{% else %}<p class="muted">مدیر فروشگاه می‌تواند توضیحات این صفحه را از بخش مدیریت وارد کند.</p>{% endif %}
+</article>
+{% endblock %}

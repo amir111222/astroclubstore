@@ -13,6 +13,6 @@
       {% if product.sale_price_toman %}<span class="price-old">{{ product.price_toman|toman }} تومان</span>{% endif %}
       {% if product.is_free %}<span class="price">رایگان</span>{% else %}<span class="price"><bdi dir="ltr">{{ product.available_price_toman|toman }}</bdi> <span class="price-unit">تومان</span></span>{% endif %}
     </div>
-    <a class="button button-outline button-sm product-card-action" href="{% url 'catalog:product' slug=product.slug %}">جزئیات محصول</a>
+    {% if product.is_available and not product.is_digital and not product.is_free and not product.variants.all %}<form class="card-cart-form" method="post" action="{% url 'commerce:cart_add' slug=product.slug %}" data-card-cart>{% csrf_token %}<div class="card-qty-control"><button class="card-qty-btn" type="button" data-qty-dec aria-label="کاهش تعداد">−</button><input class="card-qty-input" type="number" name="quantity" value="1" min="1" max="99" aria-label="تعداد"><button class="card-qty-btn" type="button" data-qty-inc aria-label="افزایش تعداد">+</button></div><button class="button button-primary button-sm" type="submit">افزودن به سبد</button></form>{% else %}<a class="button button-outline button-sm product-card-action" href="{% url 'catalog:product' slug=product.slug %}">جزئیات محصول</a>{% endif %}
   </div>
 </article>

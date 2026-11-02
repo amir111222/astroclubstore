@@ -42,9 +42,14 @@
           <a class="icon-link" href="{% url 'account:login' %}"><span class="nav-icon nav-icon-profile" aria-hidden="true"></span><span class="action-label">ورود</span></a>
         {% endif %}
         <a class="icon-link" href="{% url 'commerce:wishlist' %}" aria-label="علاقه‌مندی‌ها"><span class="nav-icon nav-icon-wishlist" aria-hidden="true"></span><span class="action-label">علاقه‌مندی‌ها</span></a>
-        <a class="icon-link" href="{% url 'commerce:cart' %}" aria-label="سبد خرید، {{ cart_count }} کالا">
-          <span class="nav-icon nav-icon-cart" aria-hidden="true"></span><span class="action-label">سبد</span><span class="count-badge">{{ cart_count }}</span>
-        </a>
+        <div class="cart-dropdown-wrap" data-cart-dropdown>
+          <button class="icon-link" type="button" aria-label="سبد خرید، {{ cart_count }} کالا" aria-expanded="false" data-cart-toggle>
+            <span class="nav-icon nav-icon-cart" aria-hidden="true"></span><span class="action-label">سبد</span><span class="count-badge" data-cart-count>{{ cart_count }}</span>
+          </button>
+          <div class="cart-dropdown" role="dialog" aria-label="سبد خرید" hidden>
+            <div data-cart-dropdown-body>{% include "_cart_dropdown_body.html" %}</div>
+          </div>
+        </div>
       </div>
     </div>
     <nav class="main-nav" aria-label="راهبری اصلی">
@@ -53,7 +58,20 @@
         <ul class="nav-links" id="main-navigation">
           <li><a href="{% url 'storefront:home' %}">خانه</a></li>
           <li><a href="{% url 'catalog:products' %}">همهٔ محصولات</a></li>
-          <li><a href="{% url 'catalog:categories' %}">دسته‌بندی‌ها</a></li>
+          <li class="nav-category-item" data-category-dropdown>
+            <button class="nav-category-toggle" type="button" data-category-toggle aria-expanded="false" aria-controls="nav-category-menu">دسته‌بندی‌ها <span aria-hidden="true">⌄</span></button>
+            <div class="nav-category-menu" id="nav-category-menu" hidden>
+              <a class="nav-category-all" href="{% url 'catalog:categories' %}">مشاهدهٔ همهٔ دسته‌ها</a>
+              {% for category in nav_categories %}
+                <div class="nav-category-group">
+                  <a href="{% url 'catalog:category' category_slug=category.slug %}">{{ category.name }}</a>
+                  {% for child in category.active_children %}<a class="nav-category-child" href="{% url 'catalog:category' category_slug=child.slug %}">{{ child.name }}</a>{% endfor %}
+                </div>
+              {% empty %}
+                <span class="nav-category-empty">دسته‌ای برای نمایش وجود ندارد.</span>
+              {% endfor %}
+            </div>
+          </li>
           <li><a href="{% url 'storefront:about' %}">دربارهٔ ما</a></li>
           <li><a href="{% url 'storefront:contact' %}">تماس</a></li>
           <li><a href="{% url 'storefront:faq' %}">پرسش‌ها</a></li>

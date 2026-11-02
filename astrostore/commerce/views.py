@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import F
+from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -48,8 +49,13 @@ def cart_add(request, slug):
         quantity = int(request.POST.get("quantity", "1"))
         add_to_cart(get_cart(request), product, variant, quantity)
     except (ValueError, StockError) as exc:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"ok": False, "error": str(exc) or "تعداد واردشده معتبر نیست."}, status=400)
         messages.error(request, str(exc) or "تعداد واردشده معتبر نیست.")
         return redirect("catalog:product", slug=slug)
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        count = sum(get_cart(request).items.values_list("quantity", flat=True))
+        return JsonResponse({"ok": True, "cart_count": count})
     messages.success(request, "محصول به سبد خرید اضافه شد.")
     return redirect("commerce:cart")
 
@@ -65,6 +71,27 @@ def cart_update(request, item_id):
     else:
         messages.success(request, "سبد خرید به‌روز شد.")
     return redirect("commerce:cart")
+
+
+@require_POST
+def cart_decrease(request, item_id):
+    cart = get_cart(request)
+    item = CartItem.objects.filter(pk=item_id, cart=cart).first()
+    if item is None:
+        return JsonResponse({"ok": False, "error": "این مورد در سبد نیست."}, status=404)
+    if item.quantity <= 1:
+        item.delete()
+    else:
+        item.quantity -= 1
+        item.save(update_fields=["quantity"])
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    if not is_ajax:
+        return redirect("commerce:cart")
+    from django.template.loader import render_to_string
+    items = list(cart.items.select_related("product", "variant").order_by("-pk")[:5])
+    count = sum(cart.items.values_list("quantity", flat=True))
+    html = render_to_string("_cart_dropdown_body.html", {"cart_mini_items": items, "cart_count": count}, request=request)
+    return JsonResponse({"ok": True, "cart_count": count, "html": html})
 
 
 @require_POST
@@ -109,6 +136,9 @@ def wishlist_to_cart(request, item_id):
     except StockError as exc:
         messages.error(request, str(exc))
         return redirect("commerce:wishlist")
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        count = sum(get_cart(request).items.values_list("quantity", flat=True))
+        return JsonResponse({"ok": True, "cart_count": count})
     messages.success(request, "محصول به سبد خرید اضافه شد.")
     return redirect("commerce:cart")
 

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load catalog_tags %}
 {% block content %}
-<section class="hero" aria-label="معرفی فروشگاه">
+<section class="hero{% if banners %} hero-with-banner{% endif %}" aria-label="معرفی فروشگاه">
   {% if banners %}
     <div class="hero-copy">
       {% for banner in banners %}
@@ -14,11 +14,11 @@
       {% endfor %}
     </div>
     <div class="hero-art" aria-hidden="true">
-      {% with first_banner=banners.0 %}
-        {% if first_banner.image %}<img class="hero-banner-image" data-hero-image src="{{ first_banner.image.url }}" alt="" loading="eager">{% endif %}
-      {% endwith %}
       <span class="hero-orbit"></span><span class="hero-disc"></span><span class="hero-dots"></span>
     </div>
+    {% with first_banner=banners.0 %}
+      {% if first_banner.image %}<img class="hero-banner-image" data-hero-image src="{{ first_banner.image.url }}" alt="" aria-hidden="true" loading="eager">{% endif %}
+    {% endwith %}
     {% if banners|length > 1 %}
       <div class="banner-controls" aria-label="انتخاب بنر">
         {% for banner in banners %}<button class="banner-dot" type="button" data-banner-dot="{{ forloop.counter0 }}" aria-label="بنر {{ forloop.counter }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}"></button>{% endfor %}

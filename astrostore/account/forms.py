@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -6,12 +8,23 @@ from .phone import normalize_digits, normalize_phone
 
 
 class PhoneForm(forms.Form):
-    phone_number = forms.CharField(label="شمارهٔ همراه", max_length=24)
+    phone_number = forms.CharField(
+        label="شمارهٔ همراه", max_length=11, min_length=11,
+        widget=forms.TextInput(attrs={
+            "type": "tel", "inputmode": "numeric", "autocomplete": "tel-national", "dir": "ltr",
+            "placeholder": "09121234567", "maxlength": "11", "pattern": "09[0-9]{9}",
+            "data-phone-input": "", "required": "required",
+        }),
+    )
     remember_me = forms.BooleanField(label="ورود من را به خاطر بسپار", required=False, initial=True)
 
     def clean_phone_number(self):
+        raw = normalize_digits(self.cleaned_data["phone_number"]).strip()
+        if not re.fullmatch(r"09\d{9}", raw):
+            raise ValidationError("شماره را به شکل ۰۹۱۲۱۲۳۴۵۶۷ وارد کنید.")
         try:
-            return normalize_phone(self.cleaned_data["phone_number"])
+            # "09121234567" -> "+989121234567"
+            return normalize_phone("+98" + raw[1:])
         except ValueError as exc:
             raise ValidationError(str(exc)) from exc
 

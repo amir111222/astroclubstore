@@ -1,0 +1,16 @@
+<div class="cart-dropdown-head"><span>سبد خرید</span><span class="count-badge" data-cart-count>{{ cart_count }}</span></div>
+            {% if cart_mini_items %}
+              <ul class="cart-dropdown-list">
+                {% for item in cart_mini_items %}
+                <li class="cart-drop-item">
+                  {% if item.product.image %}<img src="{{ item.product.image.url }}" alt="" loading="lazy">{% else %}<span class="product-placeholder product-placeholder-sm" aria-hidden="true"><span>✦</span></span>{% endif %}
+                  <div class="cart-drop-info"><span class="cart-drop-name">{{ item.product.name }}{% if item.variant %} · {{ item.variant.title }}{% endif %}</span><span class="cart-drop-meta">{{ item.quantity }} عدد</span></div>
+                  <form method="post" action="{% url 'commerce:cart_decrease' item_id=item.pk %}" class="cart-drop-dec-form" data-cart-dec>{% csrf_token %}<button type="submit" class="cart-drop-dec" aria-label="کم کردن یک عدد از {{ item.product.name }}" title="{% if item.quantity > 1 %}کم کردن یک عدد{% else %}حذف از سبد{% endif %}">−</button></form>
+                </li>
+                {% endfor %}
+              </ul>
+              {% if cart_count > 5 %}<p class="cart-drop-more">و {{ cart_count|add:"-5" }} مورد دیگر…</p>{% endif %}
+            {% else %}
+              <p class="cart-drop-empty">سبد خالی است</p>
+            {% endif %}
+            <a class="button button-primary button-sm cart-drop-cta" href="{% url 'commerce:cart' %}">مشاهده سبد</a>

@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% load catalog_tags %}
-{% block extra_head %}<script type="application/ld+json">{{ product|product_json_ld }}</script>{% endblock %}
+{% block extra_head %}<script type="application/ld+json">{{ product|product_json_ld }}</script>
+<div class="cart-modal-overlay" id="cart-added-modal" role="dialog" aria-modal="true" aria-label="محصول به سبد اضافه شد" hidden>
+  <div class="cart-modal">
+    <span class="cart-modal-icon" aria-hidden="true">✓</span>
+    <h2 class="cart-modal-title">محصول به سبد اضافه شد</h2>
+    <p class="cart-modal-msg" id="cart-modal-name"></p>
+    <div class="cart-modal-actions">
+      <button class="button button-outline" type="button" data-modal-continue>ادامه</button>
+      <a class="button button-primary" href="{% url 'storefront:home' %}">صفحهٔ اصلی</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
 {% block content %}
 <nav class="breadcrumb" aria-label="مسیر صفحه"><a href="{% url 'storefront:home' %}">خانه</a><span>/</span>{% if product.category %}<a href="{% url 'catalog:category' category_slug=product.category.slug %}">{{ product.category.name }}</a><span>/</span>{% endif %}<span>{{ product.name }}</span></nav>
 <div class="product-detail">

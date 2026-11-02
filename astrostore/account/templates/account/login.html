@@ -7,9 +7,9 @@
     <form method="post" class="form-stack" data-loading-form>
       {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
       {% if form.non_field_errors %}<div class="form-error">{{ form.non_field_errors }}</div>{% endif %}
-      <div class="field">{{ form.phone_number.label_tag }}{{ form.phone_number }}{% for error in form.phone_number.errors %}<span class="field-error">{{ error }}</span>{% endfor %}<small class="help-text">نمونه: ۰۹۱۲۱۲۳۴۵۶۷</small></div>
+      <div class="field">{{ form.phone_number.label_tag }}{{ form.phone_number }}{% for error in form.phone_number.errors %}<span class="field-error">{{ error }}</span>{% endfor %}<small class="help-text">نمونه: 09121234567 (۱۱ رقم، شروع با 09)</small></div>
       <label class="check-row">{{ form.remember_me }}<span>{{ form.remember_me.label }}</span></label>
-      <button class="button button-primary" type="submit">دریافت کد ورود</button>
+      <button class="button button-primary" type="submit" data-phone-submit disabled>دریافت کد ورود</button>
     </form>
   </section>
 </div>

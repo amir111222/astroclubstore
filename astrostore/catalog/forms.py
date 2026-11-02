@@ -136,11 +136,25 @@ class DigitalProductForm(forms.ModelForm):
         super()._post_clean()
 
 
+class PrivateFileInput(forms.FileInput):
+    """File input that never builds a URL, so private files can be edited safely."""
+
+    def format_value(self, value):
+        return None
+
+
 class DigitalAssetForm(forms.ModelForm):
     class Meta:
         model = DigitalAsset
         fields = ("title", "file", "is_active")
         labels = {"title": "عنوان فایل", "file": "فایل", "is_active": "فعال"}
+        widgets = {"file": PrivateFileInput()}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["file"].required = False
+            self.fields["file"].help_text = f"فایل فعلی: {self.instance.original_name or self.instance.file.name}. برای جایگزینی، فایل تازه انتخاب کنید."
 
 
 DigitalAssetFormSet = inlineformset_factory(Product, DigitalAsset, form=DigitalAssetForm, extra=1, can_delete=True)

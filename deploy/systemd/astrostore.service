@@ -1,0 +1,24 @@
+[Unit]
+Description=Astrostore Django application
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=astrostore
+Group=astrostore
+WorkingDirectory=/srv/astrostore/app/astrostore
+EnvironmentFile=/etc/astrostore.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/srv/astrostore/venv/bin/python -m gunicorn astrostore.wsgi:application --bind 127.0.0.1:8000 --workers 2 --threads 2 --timeout 120 --access-logfile - --error-logfile - --capture-output
+Restart=always
+RestartSec=3
+UMask=0007
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/srv/astrostore/shared/media /srv/astrostore/shared/private_media
+MemoryMax=450M
+
+[Install]
+WantedBy=multi-user.target

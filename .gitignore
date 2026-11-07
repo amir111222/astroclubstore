@@ -1,21 +1,53 @@
-.env
+# Python
 .venv/
-node_modules/
+venv/
 __pycache__/
 *.py[cod]
+*$py.class
+*.egg-info/
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
 
+# Node
+node_modules/
+
+# Django / local data
+.env
+.env.local
+*.sqlite3
 astrostore/db.sqlite3
 astrostore/media/
 astrostore/staticfiles/
-
 private_media/
 astrostore/private_media/
 
-.deployment-production.env
-.deployment-db-password
-.deployment-data.json
-.deployment-*.tar.gz
-.deployment-*.tgz
-.deployment-code.tgz
-.deployment-wheelhouse/
+# Deployment secrets and one-off server dumps
+.deployment-*
+*.tar.gz
+*.tgz
+
+# Graphify working files (keep graph.json / graph.html / manifest.json)
+graphify-out/cache/
+graphify-out/.graphify_*
+graphify-out/.vocab.txt
+graphify-out/cost.json
+
+# Editor / OS
+.idea/
+.vscode/
+.cursor/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local leftovers
+*.log
+*.png
+!astrostore/static/**/*.png
+Screenshot*.png
+astrostore/B_Yekan.zip

@@ -1,0 +1,8 @@
+[Unit]
+Description=Run daily Astrostore OTP data cleanup
+[Timer]
+OnCalendar=*-*-* 22:30:00 UTC
+Persistent=true
+AccuracySec=1min
+[Install]
+WantedBy=timers.target

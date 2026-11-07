@@ -1,0 +1,10 @@
+[Unit]
+Description=Release expired Astrostore inventory reservations
+After=postgresql.service
+[Service]
+Type=oneshot
+User=astrostore
+Group=astrostore
+WorkingDirectory=/srv/astrostore/app/astrostore
+EnvironmentFile=/etc/astrostore.env
+ExecStart=/srv/astrostore/venv/bin/python manage.py release_expired_reservations --limit 200

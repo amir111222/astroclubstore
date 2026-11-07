@@ -1,0 +1,12 @@
+[Unit]
+Description=Poll GitHub for Astrostore updates
+
+[Timer]
+OnBootSec=30s
+OnUnitInactiveSec=30s
+AccuracySec=5s
+Persistent=true
+Unit=astrostore-sync.service
+
+[Install]
+WantedBy=timers.target

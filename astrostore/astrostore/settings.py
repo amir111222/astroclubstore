@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -142,11 +143,19 @@ MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", str(BASE_DIR / "media")))
 PRIVATE_MEDIA_ROOT = Path(os.environ.get("PRIVATE_MEDIA_ROOT", str(BASE_DIR / "private_media")))
 DIGITAL_MAX_UPLOAD_MB = int(os.environ.get("DIGITAL_MAX_UPLOAD_MB", "200"))
 DIGITAL_DOWNLOAD_LIMIT = int(os.environ.get("DIGITAL_DOWNLOAD_LIMIT", "5"))
+class StoreManifestStaticFilesStorage(ManifestStaticFilesStorage):
+    """Skip Tailwind source files; they are build inputs, not hashed stylesheets."""
+
+    def post_process(self, paths, dry_run=False, **options):
+        filtered = {name: details for name, details in paths.items() if not name.endswith(".input.css")}
+        yield from super().post_process(filtered, dry_run=dry_run, **options)
+
+
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {
         "BACKEND": (
-            "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+            "astrostore.settings.StoreManifestStaticFilesStorage"
             if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage"
         )
     },
@@ -162,10 +171,10 @@ LOGOUT_REDIRECT_URL = "storefront:home"
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
 SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_HSTS_SECONDS", "31536000" if not DEBUG else "0"))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_HSTS_INCLUDE_SUBDOMAINS", False)

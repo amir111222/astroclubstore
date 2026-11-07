@@ -8,7 +8,14 @@ __pycache__/
 astrostore/db.sqlite3
 astrostore/media/
 astrostore/staticfiles/
-astrostore/static/css/tailwind.generated.css
 
 private_media/
 astrostore/private_media/
+
+.deployment-production.env
+.deployment-db-password
+.deployment-data.json
+.deployment-*.tar.gz
+.deployment-*.tgz
+.deployment-code.tgz
+.deployment-wheelhouse/

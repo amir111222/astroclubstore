@@ -21,7 +21,7 @@ chown -R astrostore:astrostore "$APP_ROOT"
 chown -R astrostore:astrostore /srv/astrostore/shared/media /srv/astrostore/shared/private_media
 
 if [[ -f "$APP_ROOT/requirements.txt" ]]; then
-  if "$VENV/bin/pip" install -q -r "$APP_ROOT/requirements.txt"; then
+  if timeout 45 "$VENV/bin/pip" install -q -r "$APP_ROOT/requirements.txt"; then
     echo "dependencies installed"
   else
     echo "pip install skipped or failed (using existing venv)" >&2

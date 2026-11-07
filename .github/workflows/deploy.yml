@@ -1,13 +1,9 @@
-name: Deploy
+name: CI
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
-concurrency:
-  group: production-deploy
-  cancel-in-progress: false
 
 jobs:
   test:
@@ -31,66 +27,3 @@ jobs:
           DJANGO_SECRET_KEY: ci-test-secret-not-for-production
           DJANGO_ALLOWED_HOSTS: testserver,localhost,127.0.0.1
         run: python manage.py test account catalog commerce payments storefront --verbosity=1
-
-  deploy:
-    name: Deploy to production
-    needs: test
-    if: ${{ secrets.DEPLOY_SSH_KEY != '' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-
-      - name: Build CSS and fonts
-        run: |
-          npm ci
-          npm run build
-
-      - name: Prepare SSH
-        env:
-          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-        run: |
-          test -n "$DEPLOY_SSH_KEY"
-          test -n "$DEPLOY_HOST"
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
-
-      - name: Sync application
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-        run: |
-          rsync -az --delete \
-            --exclude '.git/' \
-            --exclude '.github/' \
-            --exclude '.venv/' \
-            --exclude 'node_modules/' \
-            --exclude 'graphify-out/' \
-            --exclude 'astrostore/media/' \
-            --exclude 'astrostore/staticfiles/' \
-            --exclude 'astrostore/private_media/' \
-            --exclude 'private_media/' \
-            --exclude '.env' \
-            --exclude '.deployment-*' \
-            --exclude '*.tar.gz' \
-            --exclude '*.tgz' \
-            --exclude '.cursor/' \
-            -e 'ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes' \
-            ./ "${DEPLOY_USER}@${DEPLOY_HOST}:/srv/astrostore/app/"
-
-      - name: Apply on server
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-        run: |
-          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes \
-            "${DEPLOY_USER}@${DEPLOY_HOST}" \
-            "chmod +x /srv/astrostore/app/scripts/server-deploy.sh && DEPLOY_SHA='${{ github.sha }}' /srv/astrostore/app/scripts/server-deploy.sh"
